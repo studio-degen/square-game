@@ -4,17 +4,35 @@ let cols, rows;
 let colorNum = 6;
 let colArray = [];
 let rotator = {x: 360, y: 360};
-let polyminoes = [[[2, 2], [3, 2], [3, 3], [4, 3], [4, 4]], 
-                  [[4, 2], [5, 2], [5, 3], [6, 2]],
-                  [[2, 3], [2, 4], [3, 4], [3, 5]],
-                  [[2, 5], [2, 6], [3, 6], [4, 6]],
-                  [[4, 5], [5, 5], [5, 6], [6, 5], [6, 6]],
-                  [[5, 4], [6, 3], [6, 4]]
-                  ];
+let polys = [[[2, 2], [3, 2], [3, 3], [4, 3], [4, 4]], 
+              [[4, 2], [5, 2], [5, 3], [6, 2]],
+              [[2, 3], [2, 4], [3, 4], [3, 5]],
+              [[2, 5], [2, 6], [3, 6], [4, 6]],
+              [[4, 5], [5, 5], [5, 6], [6, 5], [6, 6]],
+              [[5, 4], [6, 3], [6, 4]]
+              ];
 let colors = ['#4E944F', '#83BD75', '#E9EFC0', '#363062', '#827397', '#E9D5DA'];
 let val1 = 1;
 let val2 = 7;
 let rightBtn = false;
+
+function createBoard() {
+  let squares = [[2, 2], [2, 3], [2, 4], [2, 5], [2, 6],
+                [3, 2], [3, 3], [3, 4], [3, 5], [3, 6],
+                [4, 2], [4, 3], [4, 4], [4, 5], [4, 6],
+                [5, 2], [5, 3], [5, 4], [5, 5], [5, 6],
+                [6, 2], [6, 3], [6, 4], [6, 5], [6, 6]
+                ];
+  let polyominoes = [[], [], [], [], [], []];
+  let rand = floor(random(25));
+  let first = squares[rand];
+  //console.log(first);
+  polyominoes[0].push(first);
+  squares.splice(squares[rand], 1);
+  let firstNeigh = [[first[0]-1, first[1]-1], [first[0], first[1]-1], [first[0]+1, first[1]-1],
+                    [first[0], first[1]-1], [first[0], first[1]+1],
+                    [first[0]-1, first[1]+1], [first[0], first[1]+1], [first[0]+1, first[1]+1]];
+}
 
 function make2DArray(cols, rows){
   let arr = new Array(cols);
@@ -41,13 +59,14 @@ function setup() {
     }
   }
 
-  polyminoes.forEach((p, index) => {
+  polys.forEach((p, index) => {
     p.forEach((c) => {
         grid[c[0]][c[1]].col.push(colors[index]);
     })
   });
 
-  scramble(10);
+  createBoard();
+  //scramble(10);
 }
 
 function mousePressed() {
