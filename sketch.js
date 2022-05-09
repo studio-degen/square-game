@@ -266,12 +266,12 @@ function stepLoop() {
             colors.player1.forEach((c) => {
               if(c == myCol){
                 let newpol = [];
-                if (keyIsDown(RIGHT_ARROW)) {          
+                if (keyIsDown(RIGHT_ARROW || rightBtn)) {          
                   newpol = rotatomino(i, j, 'right', myCol);
                   
                 }
 
-                if (keyIsDown(LEFT_ARROW)) {
+                if (keyIsDown(LEFT_ARROW || leftBtn)) {
                   newpol = rotatomino(i, j, 'left', myCol);
 
                 }
@@ -287,12 +287,12 @@ function stepLoop() {
             colors.player2.forEach((c) => {
               if(c == myCol){
                 let newpol = [];
-                if (keyIsDown(RIGHT_ARROW)) {          
+                if (keyIsDown(RIGHT_ARROW || rightBtn)) {          
                   newpol = rotatomino(i, j, 'right', myCol);
                   
                 }
 
-                if (keyIsDown(LEFT_ARROW)) {
+                if (keyIsDown(LEFT_ARROW || leftBtn)) {
                   newpol = rotatomino(i, j, 'left', myCol);
 
                 }
