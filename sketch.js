@@ -269,9 +269,7 @@ function stepLoop() {
                 if (keyIsDown(RIGHT_ARROW || rightBtn)) {          
                   newpol = rotatomino(i, j, 'right', myCol);
                   
-                }
-
-                if (keyIsDown(LEFT_ARROW || leftBtn)) {
+                }else if (keyIsDown(LEFT_ARROW || leftBtn)) {
                   newpol = rotatomino(i, j, 'left', myCol);
 
                 }
@@ -290,9 +288,7 @@ function stepLoop() {
                 if (keyIsDown(RIGHT_ARROW || rightBtn)) {          
                   newpol = rotatomino(i, j, 'right', myCol);
                   
-                }
-
-                if (keyIsDown(LEFT_ARROW || leftBtn)) {
+                }else if (keyIsDown(LEFT_ARROW || leftBtn)) {
                   newpol = rotatomino(i, j, 'left', myCol);
 
                 }
