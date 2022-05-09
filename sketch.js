@@ -1,38 +1,38 @@
-let grid;
+//let grid;
 let size = 80;
 let cols, rows;
-let colorNum = 6;
-let colArray = [];
 let rotator = {x: 360, y: 360};
-let polys = [[[2, 2], [3, 2], [3, 3], [4, 3], [4, 4]], 
+let polys = {player1: [[[2, 2], [3, 2], [3, 3], [4, 3], [4, 4]], 
               [[4, 2], [5, 2], [5, 3], [6, 2]],
-              [[2, 3], [2, 4], [3, 4], [3, 5]],
-              [[2, 5], [2, 6], [3, 6], [4, 6]],
+              [[2, 3], [2, 4], [3, 4], [3, 5]]],
+              player2: [[[2, 5], [2, 6], [3, 6], [4, 6]],
               [[4, 5], [5, 5], [5, 6], [6, 5], [6, 6]],
-              [[5, 4], [6, 3], [6, 4]]
-              ];
-let colors = ['#4E944F', '#83BD75', '#E9EFC0', '#363062', '#827397', '#E9D5DA'];
+              [[5, 4], [6, 3], [6, 4]]]
+            };
+let colors = {player1: ['#4E944F', '#83BD75', '#E9EFC0'], player2: ['#363062', '#827397', '#E9D5DA']};
 let val1 = 1;
 let val2 = 7;
 let rightBtn = false;
+let shared;
 
-function createBoard() {
-  let squares = [[2, 2], [2, 3], [2, 4], [2, 5], [2, 6],
-                [3, 2], [3, 3], [3, 4], [3, 5], [3, 6],
-                [4, 2], [4, 3], [4, 4], [4, 5], [4, 6],
-                [5, 2], [5, 3], [5, 4], [5, 5], [5, 6],
-                [6, 2], [6, 3], [6, 4], [6, 5], [6, 6]
-                ];
-  let polyominoes = [[], [], [], [], [], []];
-  let rand = floor(random(25));
-  let first = squares[rand];
-  //console.log(first);
-  polyominoes[0].push(first);
-  squares.splice(squares[rand], 1);
-  let firstNeigh = [[first[0]-1, first[1]-1], [first[0], first[1]-1], [first[0]+1, first[1]-1],
-                    [first[0], first[1]-1], [first[0], first[1]+1],
-                    [first[0]-1, first[1]+1], [first[0], first[1]+1], [first[0]+1, first[1]+1]];
-}
+//FUTURE PROCEDURAL BOARD
+// function createBoard() {
+//   let squares = [[2, 2], [2, 3], [2, 4], [2, 5], [2, 6],
+//                 [3, 2], [3, 3], [3, 4], [3, 5], [3, 6],
+//                 [4, 2], [4, 3], [4, 4], [4, 5], [4, 6],
+//                 [5, 2], [5, 3], [5, 4], [5, 5], [5, 6],
+//                 [6, 2], [6, 3], [6, 4], [6, 5], [6, 6]
+//                 ];
+//   let polyominoes = [[], [], [], [], [], []];
+//   let rand = floor(random(25));
+//   let first = squares[rand];
+//   //console.log(first);
+//   polyominoes[0].push(first);
+//   squares.splice(squares[rand], 1);
+//   let firstNeigh = [[first[0]-1, first[1]-1], [first[0], first[1]-1], [first[0]+1, first[1]-1],
+//                     [first[0], first[1]-1], [first[0], first[1]+1],
+//                     [first[0]-1, first[1]+1], [first[0], first[1]+1], [first[0]+1, first[1]+1]];
+// }
 
 function make2DArray(cols, rows){
   let arr = new Array(cols);
@@ -42,31 +42,55 @@ function make2DArray(cols, rows){
   return arr;
 }
 
+function preload() {
+  partyConnect(
+    "wss://deepstream-server-1.herokuapp.com",
+    "square_game",
+    "main"
+  );
+
+  shared = partyLoadShared("shared");
+}
+
 function setup() {
   createCanvas(720, 720);
+  rectMode(CORNER);
 
   cols = floor(width/size);
   rows = floor(height/size);
-  grid = make2DArray(cols, rows);
-
-  for (let i = 0; i < colorNum; i++) {
-    colArray.push(color(random(255), random(255), random(255)));
-  }
-
-  for(let i = 0; i < cols; i++){
-    for (let j = 0; j < rows; j++) {
-      grid[i][j] = new Cell(i * size, j * size, size)
+  if(partyIsHost()){
+    shared.currentTurn = shared.currentTurn || 'p1';
+    shared.grid = make2DArray(cols, rows);
+    for(let i = 0; i < cols; i++){
+      for (let j = 0; j < rows; j++) {
+        shared.grid[i][j] = {
+          x: i * size,
+          y: j * size,
+          w: size,
+          col: [255],
+          isRotator: false
+        };
+      }
     }
+  
+    polys.player1.forEach((p, index) => {
+      p.forEach((c) => {
+          shared.grid[c[0]][c[1]].col.push(colors.player1[index]);
+      })
+    });
+    polys.player2.forEach((p, index) => {
+      p.forEach((c) => {
+          shared.grid[c[0]][c[1]].col.push(colors.player2[index]);
+      })
+    });
+
+  
+    //createBoard();
+    scramble(10);
   }
-
-  polys.forEach((p, index) => {
-    p.forEach((c) => {
-        grid[c[0]][c[1]].col.push(colors[index]);
-    })
-  });
-
-  createBoard();
-  //scramble(10);
+  
+  
+  
 }
 
 function mousePressed() {
@@ -88,23 +112,54 @@ function mousePressed() {
 }
 
 function draw() {
+  
   background(220);
+  stroke(0);
+
+
   //console.log(map(floor(random(5)), 0, 4, 2, 6));
   //console.log(cols, rows);
 
   for(let i = 0; i < cols; i++){
     for (let j = 0; j < rows; j++) {
-      grid[i][j].show();
-      grid[i][j].rotatorCheck();
+      // grid[i][j].show();
+      // grid[i][j].rotatorCheck();
+      rectMode(CORNER);
+      fill(shared.grid[i][j].col[shared.grid[i][j].col.length - 1]);
+      rect(shared.grid[i][j].x, shared.grid[i][j].y, shared.grid[i][j].w, shared.grid[i][j].w);
+
+      if(rotator.x < shared.grid[i][j].x + shared.grid[i][j].w && 
+        rotator.x > shared.grid[i][j].x && 
+        rotator.y < shared.grid[i][j].y + shared.grid[i][j].w && 
+        rotator.y > shared.grid[i][j].y) {
+        shared.grid[i][j].isRotator = true;
+        rotator.x = shared.grid[i][j].x + shared.grid[i][j].w/2;
+        rotator.y = shared.grid[i][j].y + shared.grid[i][j].w/2;
+      }else{
+        shared.grid[i][j].isRotator = false;
+      }
     }
   }
 
-  fill(0);
-  circle(rotator.x, rotator.y, 20);
+
+  //rectMode(CENTER);
+  fill(0, 100);
+  noStroke();
+  ellipse(rotator.x, rotator.y, 20, 20);
 
 }
 
 setInterval(() => stepLoop(), 1000/15);
+
+function keyReleased() {
+  if (keyCode === 32) {
+    if(shared.currentTurn == 'p1'){
+      shared.currentTurn = 'p2';
+    }else if(shared.currentTurn == 'p2'){
+      shared.currentTurn = 'p1';
+    }
+  }
+}
 
 
 function stepLoop() {
@@ -112,27 +167,56 @@ function stepLoop() {
   for(let i = 0; i < cols; i++){
     for (let j = 0; j < rows; j++) {
       //console.log('rot');
-      if(grid[i][j].isRotator){
-        if(grid[i][j].col.length > 1) {
-          let myCol = grid[i][j].col[grid[i][j].col.length - 1];
-          //console.log(myCol, grid[i][j].col);
 
-          let newpol = [];
-          if (keyIsDown(RIGHT_ARROW)) {          
-            newpol = rotatomino(i, j, 'right', myCol);
-            
+
+      if(shared.grid[i][j].isRotator){
+        if(shared.grid[i][j].col.length > 1) {
+          let myCol = shared.grid[i][j].col[shared.grid[i][j].col.length - 1];
+          //console.log(myCol, shared.grid[i][j].col);
+          if(partyIsHost()){
+            colors.player1.forEach((c) => {
+              if(c == myCol){
+                let newpol = [];
+                if (keyIsDown(RIGHT_ARROW)) {          
+                  newpol = rotatomino(i, j, 'right', myCol);
+                  
+                }
+
+                if (keyIsDown(LEFT_ARROW)) {
+                  newpol = rotatomino(i, j, 'left', myCol);
+
+                }
+
+                //console.log(newpol);
+                newpol.forEach((p) => {
+                  shared.grid[p[0]][p[1]].col.push(myCol);
+                  //grid[p[0]][p[1]].filled = true;
+                });
+              }
+            });
+          }else{
+            colors.player2.forEach((c) => {
+              if(c == myCol){
+                let newpol = [];
+                if (keyIsDown(RIGHT_ARROW)) {          
+                  newpol = rotatomino(i, j, 'right', myCol);
+                  
+                }
+
+                if (keyIsDown(LEFT_ARROW)) {
+                  newpol = rotatomino(i, j, 'left', myCol);
+
+                }
+
+                //console.log(newpol);
+                newpol.forEach((p) => {
+                  shared.grid[p[0]][p[1]].col.push(myCol);
+                  //grid[p[0]][p[1]].filled = true;
+                });
+              }
+            });
           }
-
-          if (keyIsDown(LEFT_ARROW)) {
-            newpol = rotatomino(i, j, 'left', myCol);
-
-          }
-
-          //console.log(newpol);
-          newpol.forEach((p) => {
-            grid[p[0]][p[1]].col.push(myCol);
-            //grid[p[0]][p[1]].filled = true;
-          });
+          
         }
 
        // console.log(myCol);
@@ -206,9 +290,9 @@ function rotatomino(i, j, dir, myCol) {
   if(dir == 'right'){
     //1 cell away
     rotateRight[0].forEach((colrow) => {
-      grid[i+colrow[0]][j+colrow[1]].col.forEach((c, index) => {
+      shared.grid[i+colrow[0]][j+colrow[1]].col.forEach((c, index) => {
         if(c == myCol){
-          grid[i+colrow[0]][j+colrow[1]].col.splice(index, 1);
+          shared.grid[i+colrow[0]][j+colrow[1]].col.splice(index, 1);
           //grid[i-1][j-1].filled = false;
           let coord = [];
           coord.push(i+colrow[2]);
@@ -220,9 +304,9 @@ function rotatomino(i, j, dir, myCol) {
 
     //2 cell away
     rotateRight[1].forEach((colrow) => {
-      grid[i+colrow[0]][j+colrow[1]].col.forEach((c, index) => {
+      shared.grid[i+colrow[0]][j+colrow[1]].col.forEach((c, index) => {
         if(c == myCol){
-          grid[i+colrow[0]][j+colrow[1]].col.splice(index, 1);
+          shared.grid[i+colrow[0]][j+colrow[1]].col.splice(index, 1);
           //grid[i-1][j-1].filled = false;
           let coord = [];
           coord.push(i+colrow[2]);
@@ -236,9 +320,9 @@ function rotatomino(i, j, dir, myCol) {
   }else if(dir == 'left'){
     //1 cell away
     rotateLeft[0].forEach((colrow) => {
-      grid[i+colrow[0]][j+colrow[1]].col.forEach((c, index) => {
+      shared.grid[i+colrow[0]][j+colrow[1]].col.forEach((c, index) => {
         if(c == myCol){
-          grid[i+colrow[0]][j+colrow[1]].col.splice(index, 1);
+          shared.grid[i+colrow[0]][j+colrow[1]].col.splice(index, 1);
           //grid[i-1][j-1].filled = false;
           let coord = [];
           coord.push(i+colrow[2]);
@@ -250,9 +334,9 @@ function rotatomino(i, j, dir, myCol) {
 
     //2 cell away
     rotateLeft[1].forEach((colrow) => {
-      grid[i+colrow[0]][j+colrow[1]].col.forEach((c, index) => {
+      shared.grid[i+colrow[0]][j+colrow[1]].col.forEach((c, index) => {
         if(c == myCol){
-          grid[i+colrow[0]][j+colrow[1]].col.splice(index, 1);
+          shared.grid[i+colrow[0]][j+colrow[1]].col.splice(index, 1);
           //grid[i-1][j-1].filled = false;
           let coord = [];
           coord.push(i+colrow[2]);
@@ -277,8 +361,8 @@ function scramble(num) {
     let mapY = map(y, 0, 4, 2, 6);
 
 
-    if(grid[mapX][mapY].col.length > 1) {
-      let myCol = grid[mapX][mapY].col[grid[mapX][mapY].col.length - 1];
+    if(shared.grid[mapX][mapY].col.length > 1) {
+      let myCol = shared.grid[mapX][mapY].col[shared.grid[mapX][mapY].col.length - 1];
       //console.log(myCol, grid[i][j].col);
 
       let newpol = [];
@@ -293,47 +377,10 @@ function scramble(num) {
 
       //console.log(newpol);
       newpol.forEach((p) => {
-        grid[p[0]][p[1]].col.push(myCol);
+        shared.grid[p[0]][p[1]].col.push(myCol);
         //grid[p[0]][p[1]].filled = true;
       });
     } 
 
   }
-}
-
-
-class Cell {
-  constructor(x, y, w) {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.col = [255];
-    this.isRotator = false;
-
-  }
-
-  show() {
-    fill(this.col[this.col.length - 1]);
-    rect(this.x, this.y, this.w, this.w);
-    //fill(0);
-    //text(this.col, this.x + 10, this.y + 45);
-  }
-
-  rotatorCheck() {
-    if(rotator.x < this.x + this.w && 
-        rotator.x > this.x && 
-        rotator.y < this.y + this.w && 
-        rotator.y > this.y) {
-      this.isRotator = true;
-      rotator.x = this.x + this.w/2;
-      rotator.y = this.y + this.w/2;
-    }else{
-      this.isRotator = false;
-    }
-
-    if(this.isRotator) {
-
-    }
-  }
-
 }
