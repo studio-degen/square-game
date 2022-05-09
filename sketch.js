@@ -10,9 +10,21 @@ let polys = {player1: [[[2, 2], [3, 2], [3, 3], [4, 3], [4, 4]],
               [[5, 4], [6, 3], [6, 4]]]
             };
 let colors = {player1: ['#4E944F', '#83BD75', '#E9EFC0'], player2: ['#363062', '#827397', '#E9D5DA']};
-let val1 = 1;
-let val2 = 7;
+let serial;          // variable to hold an instance of the serialport library
+let portName = '/dev/tty.usbserial-1420';  // fill in your serial port name here
+let inData;                             // for incoming serial data
+let prevVal=-1;
+let timeInterval=200;
+let startTime =0;
+let sqWidth=80;
+
+let val1 = -1;
+let val2 = -2;
+let pVal1 = -3;
+let pVal2 = -4;
+let turn = false;
 let rightBtn = false;
+let leftBtn = false;
 let shared;
 
 //FUTURE PROCEDURAL BOARD
@@ -89,8 +101,85 @@ function setup() {
     scramble(10);
   }
   
+  serial = new p5.SerialPort();       // make a new instance of the serialport library
+  serial.on('list', printList);  // set a callback function for the serialport list event
+  serial.on('connected', serverConnected); // callback for connecting to the server
+  serial.on('open', portOpen);        // callback for the port opening
+  serial.on('data', serialEvent);     // callback for when new data arrives
+  serial.on('error', serialError);    // callback for errors
+  serial.on('close', portClose);      // callback for the port closing
+  serial.list();                      // list the serial ports
+  serial.open(portName);              // open a serial port
   
+}
+
+
+
+function printList(portList) {
+  // portList is an array of serial port names
+  for (var i = 0; i < portList.length; i++) {
+    // Display the list the console:
+    // console.log(i + portList[i]);
+  }
+}
+function serverConnected() {
+  console.log('connected to server.');
+}
+function portOpen() {
+  console.log('the serial port opened.')
+}
+function serialEvent() {
+  inData = Number(serial.read());
+  calculateGridPos(inData);
+}
+function serialError(err) {
+  console.log('Something went wrong with the serial port. ' + err);
+} 
+function portClose() {
+  console.log('The serial port closed.');
+}
+function calculateGridPos(inData){
+  if(inData < 6){
+    val1 = inData;
+  }else if(inData >= 6){
+    val2 = inData;
+  }
+    
+  if(val1 !== pVal1 || val2 !== pVal2){
+    console.log("new val1");
+    console.log("1: "+val1+", "+pVal1);
+    console.log("new val2");
+    console.log("2: "+val2+", "+pVal2);
+    //use vals data
+    useVals(val1,val2);
+
+    pVal1 = val1;
+    pVal2 = val2;
+  }   
+}
+function useVals(val1,val2){
+  if(val1 != 0){
+    let rotatorMapX = map(val2, 5.5, 10.5, 2*size, height-2*size);
+    let rotatorMapY = map(val1, 0.5, 5.5, 2*size, width-2*size);
+    console.log(rotatorMapX, rotatorMapY);
+    rotator.x = rotatorMapX;
+    rotator.y = rotatorMapY;
+  }
   
+  if(val1 == 0 && val2 == 10){
+    rightBtn = true;
+    setTimeout(()=>{
+      rightBtn = false;
+    }, 1000);
+  }else if(val1 == 0 && val2 == 9){
+    leftBtn = true;
+    setTimeout(()=>{
+      leftBtn = false;
+    }, 1000);
+  }else{
+    leftBtn = false;
+    rightBtn = false;
+  }
 }
 
 function mousePressed() {
@@ -99,8 +188,8 @@ function mousePressed() {
     rotator.y = mouseY;
   }
   if(val1 != 0){
-    let rotatorMapX = map(val1, 0.5, 5.5, 2*size, width-2*size);
-    let rotatorMapY = map(val2, 5.5, 10.5, 2*size, height-2*size);
+    // let rotatorMapX = map(val1, 0.5, 5.5, 2*size, width-2*size);
+    // let rotatorMapY = map(val2, 5.5, 10.5, 2*size, height-2*size);
     //console.log(rotatorMapX, rotatorMapY);
   }else{
     if(val2 == 10){
