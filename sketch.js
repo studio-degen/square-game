@@ -1,7 +1,7 @@
 //let grid;
 let size = 80;
 let cols, rows;
-let rotator = {x: 360, y: 360};
+//let rotator = {x: 360, y: 360};
 let polys = {player1: [[[2, 2], [3, 2], [3, 3], [4, 3], [4, 4]], 
               [[4, 2], [5, 2], [5, 3], [6, 2]],
               [[2, 3], [2, 4], [3, 4], [3, 5]]],
@@ -26,6 +26,7 @@ let turn = false;
 let rightBtn = false;
 let leftBtn = false;
 let shared;
+let me;
 
 //FUTURE PROCEDURAL BOARD
 // function createBoard() {
@@ -57,16 +58,19 @@ function make2DArray(cols, rows){
 function preload() {
   partyConnect(
     "wss://deepstream-server-1.herokuapp.com",
-    "square_game",
-    "main"
+    "sqg",
+    "ar"
   );
 
   shared = partyLoadShared("shared");
+  me = partyLoadMyShared();
 }
 
 function setup() {
   createCanvas(720, 720);
   rectMode(CORNER);
+
+  me.rotator = {x: 360, y: 360};
 
   cols = floor(width/size);
   rows = floor(height/size);
@@ -101,91 +105,94 @@ function setup() {
     scramble(10);
   }
   
-  serial = new p5.SerialPort();       // make a new instance of the serialport library
-  serial.on('list', printList);  // set a callback function for the serialport list event
-  serial.on('connected', serverConnected); // callback for connecting to the server
-  serial.on('open', portOpen);        // callback for the port opening
-  serial.on('data', serialEvent);     // callback for when new data arrives
-  serial.on('error', serialError);    // callback for errors
-  serial.on('close', portClose);      // callback for the port closing
-  serial.list();                      // list the serial ports
-  serial.open(portName);              // open a serial port
+  // serial = new p5.SerialPort();       // make a new instance of the serialport library
+  // serial.on('list', printList);  // set a callback function for the serialport list event
+  // serial.on('connected', serverConnected); // callback for connecting to the server
+  // serial.on('open', portOpen);        // callback for the port opening
+  // serial.on('data', serialEvent);     // callback for when new data arrives
+  // serial.on('error', serialError);    // callback for errors
+  // serial.on('close', portClose);      // callback for the port closing
+  // serial.list();                      // list the serial ports
+  // serial.open(portName);              // open a serial port
   
 }
 
 
 
-function printList(portList) {
-  // portList is an array of serial port names
-  for (var i = 0; i < portList.length; i++) {
-    // Display the list the console:
-    // console.log(i + portList[i]);
-  }
-}
-function serverConnected() {
-  console.log('connected to server.');
-}
-function portOpen() {
-  console.log('the serial port opened.')
-}
-function serialEvent() {
-  inData = Number(serial.read());
-  calculateGridPos(inData);
-}
-function serialError(err) {
-  console.log('Something went wrong with the serial port. ' + err);
-} 
-function portClose() {
-  console.log('The serial port closed.');
-}
-function calculateGridPos(inData){
-  if(inData < 6){
-    val1 = inData;
-  }else if(inData >= 6){
-    val2 = inData;
-  }
+// function printList(portList) {
+//   // portList is an array of serial port names
+//   for (var i = 0; i < portList.length; i++) {
+//     // Display the list the console:
+//     // console.log(i + portList[i]);
+//   }
+// }
+// function serverConnected() {
+//   console.log('connected to server.');
+// }
+// function portOpen() {
+//   console.log('the serial port opened.')
+// }
+// function serialEvent() {
+//   inData = Number(serial.read());
+//   calculateGridPos(inData);
+// }
+// function serialError(err) {
+//   console.log('Something went wrong with the serial port. ' + err);
+// } 
+// function portClose() {
+//   console.log('The serial port closed.');
+// }
+
+// function calculateGridPos(inData){
+//   if(inData < 6){
+//     val1 = inData;
+//   }else if(inData >= 6){
+//     val2 = inData;
+//   }
     
-  if(val1 !== pVal1 || val2 !== pVal2){
-    console.log("new val1");
-    console.log("1: "+val1+", "+pVal1);
-    console.log("new val2");
-    console.log("2: "+val2+", "+pVal2);
-    //use vals data
-    useVals(val1,val2);
+//   if(val1 !== pVal1 || val2 !== pVal2){
+//     console.log("new val1");
+//     console.log("1: "+val1+", "+pVal1);
+//     console.log("new val2");
+//     console.log("2: "+val2+", "+pVal2);
+//     //use vals data
+//     useVals(val1,val2);
 
-    pVal1 = val1;
-    pVal2 = val2;
-  }   
-}
-function useVals(val1,val2){
-  if(val1 != 0){
-    let rotatorMapX = map(val2, 5.5, 10.5, 2*size, height-2*size);
-    let rotatorMapY = map(val1, 0.5, 5.5, 2*size, width-2*size);
-    console.log(rotatorMapX, rotatorMapY);
-    rotator.x = rotatorMapX;
-    rotator.y = rotatorMapY;
-  }
+//     pVal1 = val1;
+//     pVal2 = val2;
+//   }   
+// }
+
+// function useVals(val1,val2){
+//   if(val1 != 0){
+//     let rotatorMapX = map(val2, 5.5, 10.5, 2*size, height-2*size);
+//     let rotatorMapY = map(val1, 0.5, 5.5, 2*size, width-2*size);
+//     console.log(rotatorMapX, rotatorMapY);
+//     rotator.x = rotatorMapX;
+//     rotator.y = rotatorMapY;
+//   }
   
-  if(val1 == 0 && val2 == 10){
-    rightBtn = true;
-    setTimeout(()=>{
-      rightBtn = false;
-    }, 1000);
-  }else if(val1 == 0 && val2 == 9){
-    leftBtn = true;
-    setTimeout(()=>{
-      leftBtn = false;
-    }, 1000);
-  }else{
-    leftBtn = false;
-    rightBtn = false;
-  }
-}
+//   if(val1 == 0 && val2 == 10){
+//     rightBtn = true;
+//     setTimeout(()=>{
+//       rightBtn = false;
+//     }, 1000);
+//   }else if(val1 == 0 && val2 == 9){
+//     leftBtn = true;
+//     setTimeout(()=>{
+//       leftBtn = false;
+//     }, 1000);
+//   }else{
+//     leftBtn = false;
+//     rightBtn = false;
+//   }
+// }
 
 function mousePressed() {
+  //console.log(shared.grid);
   if(mouseX > 2*size && mouseX < width-2*size && mouseY > 2*size && mouseY < height-2*size){
-    rotator.x = mouseX;
-    rotator.y = mouseY;
+    me.rotator.x = mouseX;
+    me.rotator.y = mouseY;
   }
   if(val1 != 0){
     // let rotatorMapX = map(val1, 0.5, 5.5, 2*size, width-2*size);
@@ -197,11 +204,31 @@ function mousePressed() {
       val2 = 0;
     }
   }
+
+  for(let i = 0; i < cols; i++){
+    for (let j = 0; j < rows; j++) {
+      // grid[i][j].show();
+      // grid[i][j].rotatorCheck();
+
+      if(me.rotator.x < shared.grid[i][j].x + shared.grid[i][j].w && 
+        me.rotator.x > shared.grid[i][j].x && 
+        me.rotator.y < shared.grid[i][j].y + shared.grid[i][j].w && 
+        me.rotator.y > shared.grid[i][j].y) {
+        shared.grid[i][j].isRotator = true;
+        me.rotator.x = shared.grid[i][j].x + shared.grid[i][j].w/2;
+        me.rotator.y = shared.grid[i][j].y + shared.grid[i][j].w/2;
+      }else{
+        shared.grid[i][j].isRotator = false;
+      }
+    }
+  }
   
 }
 
+
 function draw() {
   
+
   background(220);
   stroke(0);
 
@@ -216,17 +243,6 @@ function draw() {
       rectMode(CORNER);
       fill(shared.grid[i][j].col[shared.grid[i][j].col.length - 1]);
       rect(shared.grid[i][j].x, shared.grid[i][j].y, shared.grid[i][j].w, shared.grid[i][j].w);
-
-      if(rotator.x < shared.grid[i][j].x + shared.grid[i][j].w && 
-        rotator.x > shared.grid[i][j].x && 
-        rotator.y < shared.grid[i][j].y + shared.grid[i][j].w && 
-        rotator.y > shared.grid[i][j].y) {
-        shared.grid[i][j].isRotator = true;
-        rotator.x = shared.grid[i][j].x + shared.grid[i][j].w/2;
-        rotator.y = shared.grid[i][j].y + shared.grid[i][j].w/2;
-      }else{
-        shared.grid[i][j].isRotator = false;
-      }
     }
   }
 
@@ -234,7 +250,7 @@ function draw() {
   //rectMode(CENTER);
   fill(0, 100);
   noStroke();
-  ellipse(rotator.x, rotator.y, 20, 20);
+  ellipse(me.rotator.x, me.rotator.y, 20, 20);
 
 }
 
