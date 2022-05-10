@@ -46,8 +46,8 @@ let polys = {
   ],
 };
 let colors = {
-  player1: ["#4E944F", "#83BD75", "#E9EFC0"],
-  player2: ["#363062", "#827397", "#E9D5DA"],
+  player1: ["#4400FF", "#6000FF", "#7B00FF"],
+  player2: ["#FF7B00", "#FF9100", "#FFA600"],
 };
 let serial; // variable to hold an instance of the serialport library
 let portName = "/dev/tty.usbserial-1420"; // fill in your serial port name here
