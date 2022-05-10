@@ -139,88 +139,90 @@ function setup() {
     scramble(10);
   }
 
-  // serial = new p5.SerialPort();       // make a new instance of the serialport library
-  // serial.on('list', printList);  // set a callback function for the serialport list event
-  // serial.on('connected', serverConnected); // callback for connecting to the server
-  // serial.on('open', portOpen);        // callback for the port opening
-  // serial.on('data', serialEvent);     // callback for when new data arrives
-  // serial.on('error', serialError);    // callback for errors
-  // serial.on('close', portClose);      // callback for the port closing
-  // serial.list();                      // list the serial ports
-  // serial.open(portName);              // open a serial port
+  serial = new p5.SerialPort();       // make a new instance of the serialport library
+  serial.on('list', printList);  // set a callback function for the serialport list event
+  serial.on('connected', serverConnected); // callback for connecting to the server
+  serial.on('open', portOpen);        // callback for the port opening
+  serial.on('data', serialEvent);     // callback for when new data arrives
+  serial.on('error', serialError);    // callback for errors
+  serial.on('close', portClose);      // callback for the port closing
+  serial.list();                      // list the serial ports
+  serial.open(portName);              // open a serial port
 }
 
-// function printList(portList) {
-//   // portList is an array of serial port names
-//   for (var i = 0; i < portList.length; i++) {
-//     // Display the list the console:
-//     // console.log(i + portList[i]);
-//   }
-// }
-// function serverConnected() {
-//   console.log('connected to server.');
-// }
-// function portOpen() {
-//   console.log('the serial port opened.')
-// }
-// function serialEvent() {
-//   inData = Number(serial.read());
-//   calculateGridPos(inData);
-// }
-// function serialError(err) {
-//   console.log('Something went wrong with the serial port. ' + err);
-// }
-// function portClose() {
-//   console.log('The serial port closed.');
-// }
+function printList(portList) {
+  // portList is an array of serial port names
+  for (var i = 0; i < portList.length; i++) {
+    // Display the list the console:
+    // console.log(i + portList[i]);
+  }
+}
+function serverConnected() {
+  console.log('connected to server.');
+}
+function portOpen() {
+  console.log('the serial port opened.')
+}
+function serialEvent() {
+  inData = Number(serial.read());
+  calculateGridPos(inData);
+}
+function serialError(err) {
+  console.log('Something went wrong with the serial port. ' + err);
+}
+function portClose() {
+  console.log('The serial port closed.');
+}
 
-// function calculateGridPos(inData){
-//   if(inData < 6){
-//     val1 = inData;
-//   }else if(inData >= 6){
-//     val2 = inData;
-//   }
+function calculateGridPos(inData){
+  if(inData < 6){
+    val1 = inData;
+  }else if(inData >= 6){
+    val2 = inData;
+  }
 
-//   if(val1 !== pVal1 || val2 !== pVal2){
-//     console.log("new val1");
-//     console.log("1: "+val1+", "+pVal1);
-//     console.log("new val2");
-//     console.log("2: "+val2+", "+pVal2);
-//     //use vals data
-//     useVals(val1,val2);
+  if(val1 !== pVal1 || val2 !== pVal2){
+    console.log("new val1");
+    console.log("1: "+val1+", "+pVal1);
+    console.log("new val2");
+    console.log("2: "+val2+", "+pVal2);
+    //use vals data
+    useVals(val1,val2);
 
-//     pVal1 = val1;
-//     pVal2 = val2;
-//   }
-// }
+    pVal1 = val1;
+    pVal2 = val2;
+  }
+}
 
-// function useVals(val1,val2){
-//   if(val1 != 0){
-//     let rotatorMapX = map(val2, 5.5, 10.5, 2*size, height-2*size);
-//     let rotatorMapY = map(val1, 0.5, 5.5, 2*size, width-2*size);
-//     console.log(rotatorMapX, rotatorMapY);
-//     rotator.x = rotatorMapX;
-//     rotator.y = rotatorMapY;
-//   }
+function useVals(val1,val2){
+  if(val1 != 0){
+    let rotatorMapX = map(val2, 5.5, 10.5, 2*size, height-2*size);
+    let rotatorMapY = map(val1, 0.5, 5.5, 2*size, width-2*size);
+    console.log(rotatorMapX, rotatorMapY);
+    me.rotator.x = rotatorMapX;
+    me.rotator.y = rotatorMapY;
+  }
 
-//   if(val1 == 0 && val2 == 10){
-//     rightBtn = true;
-//     setTimeout(()=>{
-//       rightBtn = false;
-//     }, 1000);
-//   }else if(val1 == 0 && val2 == 9){
-//     leftBtn = true;
-//     setTimeout(()=>{
-//       leftBtn = false;
-//     }, 1000);
-//   }else{
-//     leftBtn = false;
-//     rightBtn = false;
-//   }
-// }
+  if(val1 == 0 && val2 == 10){
+    rightBtn = true;
+    console.log(rightBtn);
+    // setTimeout(()=>{
+    //   rightBtn = false;
+    // }, 1000);
+  }else if(val1 == 0 && val2 == 9){
+    leftBtn = true;
+    // setTimeout(()=>{
+    //   leftBtn = false;
+    // }, 1000);
+  }
+  // else{
+  //   leftBtn = false;
+  //   rightBtn = false;
+  // }
+}
 
 function mousePressed() {
-  //console.log(shared.grid);
+  // console.log(rightBtn);
   if (
     mouseX > 2 * size &&
     mouseX < width - 2 * size &&
@@ -331,9 +333,10 @@ function keyPressed() {
             colors.player1.forEach((c) => {
               if (c == myCol) {
                 let newpol = [];
-                if (keyIsDown(RIGHT_ARROW || rightBtn)) {
+                if (keyIsDown(RIGHT_ARROW)|| rightBtn) {
+                  rightBtn = false;
                   newpol = rotatomino(i, j, "right", myCol);
-                } else if (keyIsDown(LEFT_ARROW || leftBtn)) {
+                } else if (keyIsDown(LEFT_ARROW) || leftBtn) {
                   newpol = rotatomino(i, j, "left", myCol);
                 }
 
@@ -348,9 +351,10 @@ function keyPressed() {
             colors.player2.forEach((c) => {
               if (c == myCol) {
                 let newpol = [];
-                if (keyIsDown(RIGHT_ARROW || rightBtn)) {
+                if (keyIsDown(RIGHT_ARROW) || rightBtn) {
+                  rightBtn = false;
                   newpol = rotatomino(i, j, "right", myCol);
-                } else if (keyIsDown(LEFT_ARROW || leftBtn)) {
+                } else if (keyIsDown(LEFT_ARROW) || leftBtn) {
                   newpol = rotatomino(i, j, "left", myCol);
                 }
 
