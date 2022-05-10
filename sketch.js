@@ -206,11 +206,110 @@ function useVals(val1,val2){
   if(val1 == 0 && val2 == 10){
     rightBtn = true;
     console.log(rightBtn);
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        //console.log('rot');
+  
+        if (shared.grid[i][j].isRotator) {
+          if (shared.grid[i][j].col.length > 1) {
+            let myCol = shared.grid[i][j].col[shared.grid[i][j].col.length - 1];
+            //console.log(myCol, shared.grid[i][j].col);
+            if (partyIsHost()) {
+              colors.player1.forEach((c) => {
+                if (c == myCol) {
+                  let newpol = [];
+                  if (rightBtn) {
+                    rightBtn = false;
+                    val2 = 7;
+                    newpol = rotatomino(i, j, "right", myCol);
+                  }
+  
+                  //console.log(newpol);
+                  newpol.forEach((p) => {
+                    shared.grid[p[0]][p[1]].col.push(myCol);
+                    //grid[p[0]][p[1]].filled = true;
+                  });
+                }
+              });
+            } else {
+              colors.player2.forEach((c) => {
+                if (c == myCol) {
+                  let newpol = [];
+                  if (rightBtn) {
+                    rightBtn = false;
+                    val2 = 7;
+                    newpol = rotatomino(i, j, "right", myCol);
+                  }
+  
+                  //console.log(newpol);
+                  newpol.forEach((p) => {
+                    shared.grid[p[0]][p[1]].col.push(myCol);
+                    //grid[p[0]][p[1]].filled = true;
+                  });
+                }
+              });
+            }
+          }
+  
+          // console.log(myCol);
+        }
+      }
+    }
     // setTimeout(()=>{
     //   rightBtn = false;
     // }, 1000);
   }else if(val1 == 0 && val2 == 9){
     leftBtn = true;
+
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        //console.log('rot');
+  
+        if (shared.grid[i][j].isRotator) {
+          if (shared.grid[i][j].col.length > 1) {
+            let myCol = shared.grid[i][j].col[shared.grid[i][j].col.length - 1];
+            //console.log(myCol, shared.grid[i][j].col);
+            if (partyIsHost()) {
+              colors.player1.forEach((c) => {
+                if (c == myCol) {
+                  let newpol = [];
+                  if (leftBtn) {
+                    leftBtn = false;
+                    val2 = 7;
+                    newpol = rotatomino(i, j, "left", myCol);
+                  }
+  
+                  //console.log(newpol);
+                  newpol.forEach((p) => {
+                    shared.grid[p[0]][p[1]].col.push(myCol);
+                    //grid[p[0]][p[1]].filled = true;
+                  });
+                }
+              });
+            } else {
+              colors.player2.forEach((c) => {
+                if (c == myCol) {
+                  let newpol = [];
+                  if (leftBtn) {
+                    leftBtn = false;
+                    val2 = 7;
+                    newpol = rotatomino(i, j, "left", myCol);
+                  }
+  
+                  //console.log(newpol);
+                  newpol.forEach((p) => {
+                    shared.grid[p[0]][p[1]].col.push(myCol);
+                    //grid[p[0]][p[1]].filled = true;
+                  });
+                }
+              });
+            }
+          }
+  
+          // console.log(myCol);
+        }
+      }
+    }
     // setTimeout(()=>{
     //   leftBtn = false;
     // }, 1000);
@@ -333,7 +432,7 @@ function keyPressed() {
             colors.player1.forEach((c) => {
               if (c == myCol) {
                 let newpol = [];
-                if (keyIsDown(RIGHT_ARROW)|| rightBtn) {
+                if (keyIsDown(RIGHT_ARROW)) {
                   rightBtn = false;
                   newpol = rotatomino(i, j, "right", myCol);
                 } else if (keyIsDown(LEFT_ARROW) || leftBtn) {
@@ -351,7 +450,7 @@ function keyPressed() {
             colors.player2.forEach((c) => {
               if (c == myCol) {
                 let newpol = [];
-                if (keyIsDown(RIGHT_ARROW) || rightBtn) {
+                if (keyIsDown(RIGHT_ARROW)) {
                   rightBtn = false;
                   newpol = rotatomino(i, j, "right", myCol);
                 } else if (keyIsDown(LEFT_ARROW) || leftBtn) {
