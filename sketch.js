@@ -66,6 +66,77 @@ let rightBtn = false;
 let leftBtn = false;
 let shared;
 let me;
+let tip = "";
+
+let rotateRight = [
+  [
+    [-1, -1, 1, -1], //one
+    [0, -1, 1, 0],
+    [1, -1, 1, 1],
+    [1, 0, 0, 1],
+    [1, 1, -1, 1],
+    [0, 1, -1, 0],
+    [-1, 1, -1, -1],
+    [-1, 0, 0, -1],
+  ],
+
+  [
+    [-2, -2, 2, -2], //two //top
+    [-1, -2, 2, -1],
+    [0, -2, 2, 0],
+    [1, -2, 2, 1],
+
+    [2, -2, 2, 2], //right
+    [2, -1, 1, 2],
+    [2, 0, 0, 2],
+    [2, 1, -1, 2],
+
+    [2, 2, -2, 2], //bottom
+    [1, 2, -2, 1],
+    [0, 2, -2, 0],
+    [-1, 2, -2, -1],
+
+    [-2, 2, -2, -2], //left
+    [-2, 1, -1, -2],
+    [-2, 0, 0, -2],
+    [-2, -1, 1, -2],
+  ],
+];
+
+let rotateLeft = [
+  [
+    [-1, -1, -1, 1], //one
+    [0, -1, -1, 0],
+    [1, -1, -1, -1],
+    [1, 0, 0, -1],
+    [1, 1, 1, -1],
+    [0, 1, 1, 0],
+    [-1, 1, 1, 1],
+    [-1, 0, 0, 1],
+  ],
+
+  [
+    [-2, -2, -2, 2], //two //top
+    [-1, -2, -2, 1],
+    [0, -2, -2, 0],
+    [1, -2, -2, -1],
+
+    [2, -2, -2, -2], //right
+    [2, -1, -1, -2],
+    [2, 0, 0, -2],
+    [2, 1, 1, -2],
+
+    [2, 2, 2, -2], //bottom
+    [1, 2, 2, -1],
+    [0, 2, 2, 0],
+    [-1, 2, 2, 1],
+
+    [-2, 2, 2, 2], //left
+    [-2, 1, 1, 2],
+    [-2, 0, 0, 2],
+    [-2, -1, -1, 2],
+  ],
+];
 
 //FUTURE PROCEDURAL BOARD
 // function createBoard() {
@@ -104,6 +175,7 @@ function preload() {
 function setup() {
   createCanvas(720, 720);
   rectMode(CORNER);
+  partyToggleInfo();
 
   me.rotator = { x: 360, y: 360 };
 
@@ -320,6 +392,8 @@ function useVals(val1,val2){
   // }
 }
 
+
+
 function mousePressed() {
   // console.log(rightBtn);
   if (
@@ -359,13 +433,51 @@ function mousePressed() {
       } else {
         shared.grid[i][j].isRotator = false;
       }
+
+      if (shared.grid[i][j].isRotator) {
+        if (shared.grid[i][j].col.length > 1) {
+          let myCol = shared.grid[i][j].col[shared.grid[i][j].col.length - 1];
+          if(partyIsHost()){
+            colors.player1.forEach((c) => {
+              if (c == myCol) {
+                tip = "you can rotate this";
+              }
+            });
+            colors.player2.forEach((c) => {
+              if (c == myCol) {
+                tip = "you cant rotate this";
+              }
+            });
+            
+          }else{
+            colors.player1.forEach((c) => {
+              if (c == myCol) {
+                tip = "you cant rotate this";
+              }
+            });
+            colors.player2.forEach((c) => {
+              if (c == myCol) {
+                tip = "you can rotate this";
+              }
+            });
+          }
+        }else{
+          tip = "";
+        }
+
+      }
+      
+
+      
     }
   }
 }
 
 function draw() {
-  background(220);
+  background(255);
   stroke(0);
+
+  console.log(tip);
 
   //console.log(map(floor(random(5)), 0, 4, 2, 6));
   //console.log(cols, rows);
@@ -388,6 +500,7 @@ function draw() {
           shared.grid[i][j].w
         );
       }
+
       // let c = color(shared.grid[i][j].col[shared.grid[i][j].col.length - 1]);
       // c.setAlpha(80);
       // fill(c);
@@ -399,12 +512,21 @@ function draw() {
       //   shared.grid[i][j].w
       // );
     }
+
+    push();
+    noFill();
+    stroke(0);
+    strokeWeight(5);
+    rect(size*2, size*2, size*5, size*5);
+    pop();
   }
 
   //rectMode(CENTER);
-  fill(0, 100);
+  fill(0);
   noStroke();
   ellipse(me.rotator.x, me.rotator.y, 20, 20);
+
+  text(tip, width/2, height/2);
 }
 
 // setInterval(() => stepLoop(), 1000/15);
@@ -433,7 +555,6 @@ function keyPressed() {
               if (c == myCol) {
                 let newpol = [];
                 if (keyIsDown(RIGHT_ARROW)) {
-                  rightBtn = false;
                   newpol = rotatomino(i, j, "right", myCol);
                 } else if (keyIsDown(LEFT_ARROW) || leftBtn) {
                   newpol = rotatomino(i, j, "left", myCol);
@@ -446,12 +567,12 @@ function keyPressed() {
                 });
               }
             });
+
           } else {
             colors.player2.forEach((c) => {
               if (c == myCol) {
                 let newpol = [];
                 if (keyIsDown(RIGHT_ARROW)) {
-                  rightBtn = false;
                   newpol = rotatomino(i, j, "right", myCol);
                 } else if (keyIsDown(LEFT_ARROW) || leftBtn) {
                   newpol = rotatomino(i, j, "left", myCol);
@@ -473,75 +594,7 @@ function keyPressed() {
   }
 }
 
-let rotateRight = [
-  [
-    [-1, -1, 1, -1], //one
-    [0, -1, 1, 0],
-    [1, -1, 1, 1],
-    [1, 0, 0, 1],
-    [1, 1, -1, 1],
-    [0, 1, -1, 0],
-    [-1, 1, -1, -1],
-    [-1, 0, 0, -1],
-  ],
 
-  [
-    [-2, -2, 2, -2], //two //top
-    [-1, -2, 2, -1],
-    [0, -2, 2, 0],
-    [1, -2, 2, 1],
-
-    [2, -2, 2, 2], //right
-    [2, -1, 1, 2],
-    [2, 0, 0, 2],
-    [2, 1, -1, 2],
-
-    [2, 2, -2, 2], //bottom
-    [1, 2, -2, 1],
-    [0, 2, -2, 0],
-    [-1, 2, -2, -1],
-
-    [-2, 2, -2, -2], //left
-    [-2, 1, -1, -2],
-    [-2, 0, 0, -2],
-    [-2, -1, 1, -2],
-  ],
-];
-
-let rotateLeft = [
-  [
-    [-1, -1, -1, 1], //one
-    [0, -1, -1, 0],
-    [1, -1, -1, -1],
-    [1, 0, 0, -1],
-    [1, 1, 1, -1],
-    [0, 1, 1, 0],
-    [-1, 1, 1, 1],
-    [-1, 0, 0, 1],
-  ],
-
-  [
-    [-2, -2, -2, 2], //two //top
-    [-1, -2, -2, 1],
-    [0, -2, -2, 0],
-    [1, -2, -2, -1],
-
-    [2, -2, -2, -2], //right
-    [2, -1, -1, -2],
-    [2, 0, 0, -2],
-    [2, 1, 1, -2],
-
-    [2, 2, 2, -2], //bottom
-    [1, 2, 2, -1],
-    [0, 2, 2, 0],
-    [-1, 2, 2, 1],
-
-    [-2, 2, 2, 2], //left
-    [-2, 1, 1, 2],
-    [-2, 0, 0, 2],
-    [-2, -1, -1, 2],
-  ],
-];
 
 function rotatomino(i, j, dir, myCol) {
   let newpol = [];
