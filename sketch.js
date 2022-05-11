@@ -392,8 +392,6 @@ function useVals(val1, val2) {
   // }
 }
 
-
-
 function mousePressed() {
   // console.log(rightBtn);
   if (
@@ -437,7 +435,7 @@ function mousePressed() {
       if (shared.grid[i][j].isRotator) {
         if (shared.grid[i][j].col.length > 1) {
           let myCol = shared.grid[i][j].col[shared.grid[i][j].col.length - 1];
-          if(partyIsHost()){
+          if (partyIsHost()) {
             colors.player1.forEach((c) => {
               if (c == myCol) {
                 tip = "you can rotate this";
@@ -448,8 +446,7 @@ function mousePressed() {
                 tip = "you cant rotate this";
               }
             });
-            
-          }else{
+          } else {
             colors.player1.forEach((c) => {
               if (c == myCol) {
                 tip = "you cant rotate this";
@@ -461,14 +458,10 @@ function mousePressed() {
               }
             });
           }
-        }else{
+        } else {
           tip = "";
         }
-
       }
-      
-
-      
     }
   }
 }
@@ -517,7 +510,7 @@ function draw() {
     noFill();
     stroke(0);
     strokeWeight(5);
-    rect(size*2, size*2, size*5, size*5);
+    rect(size * 2, size * 2, size * 5, size * 5);
     pop();
   }
 
@@ -526,7 +519,7 @@ function draw() {
   noStroke();
   ellipse(me.rotator.x, me.rotator.y, 20, 20);
 
-  text(tip, width/2, height/2);
+  text(tip, width / 2, height / 2);
 }
 
 // setInterval(() => stepLoop(), 1000/15);
@@ -567,7 +560,6 @@ function keyPressed() {
                 });
               }
             });
-
           } else {
             colors.player2.forEach((c) => {
               if (c == myCol) {
@@ -593,8 +585,6 @@ function keyPressed() {
     }
   }
 }
-
-
 
 function rotatomino(i, j, dir, myCol) {
   let newpol = [];
