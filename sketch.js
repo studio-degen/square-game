@@ -405,16 +405,16 @@ function mousePressed() {
     me.rotator.x = mouseX;
     me.rotator.y = mouseY;
   }
-  if (val1 != 0) {
-    // let rotatorMapX = map(val1, 0.5, 5.5, 2*size, width-2*size);
-    // let rotatorMapY = map(val2, 5.5, 10.5, 2*size, height-2*size);
-    //console.log(rotatorMapX, rotatorMapY);
-  } else {
-    if (val2 == 10) {
-      rightBtn = true;
-      val2 = 0;
-    }
-  }
+  // if (val1 != 0) {
+  //   // let rotatorMapX = map(val1, 0.5, 5.5, 2*size, width-2*size);
+  //   // let rotatorMapY = map(val2, 5.5, 10.5, 2*size, height-2*size);
+  //   //console.log(rotatorMapX, rotatorMapY);
+  // } else {
+  //   if (val2 == 10) {
+  //     rightBtn = true;
+  //     val2 = 0;
+  //   }
+  // }
 
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
