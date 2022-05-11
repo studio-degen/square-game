@@ -270,9 +270,26 @@ function useVals(val1, val2) {
   if (val1 != 0) {
     let rotatorMapX = map(val2, 5.5, 10.5, 2 * size, height - 2 * size);
     let rotatorMapY = map(val1, 0.5, 5.5, 2 * size, width - 2 * size);
-    console.log(rotatorMapX, rotatorMapY);
-    me.rotator.x = rotatorMapX;
-    me.rotator.y = rotatorMapY;
+    //console.log(rotatorMapX, rotatorMapY);
+
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        if (
+          rotatorMapX < shared.grid[i][j].x + shared.grid[i][j].w &&
+          rotatorMapX > shared.grid[i][j].x &&
+          rotatorMapY < shared.grid[i][j].y + shared.grid[i][j].w &&
+          rotatorMapY > shared.grid[i][j].y
+        ) {
+          shared.grid[i][j].isRotator = true;
+          me.rotator.x = rotatorMapX;
+          me.rotator.y = rotatorMapY;
+          // me.rotator.x = shared.grid[i][j].x + shared.grid[i][j].w / 2;
+          // me.rotator.y = shared.grid[i][j].y + shared.grid[i][j].w / 2;
+        } else {
+          shared.grid[i][j].isRotator = false;
+        }
+      }
+    } 
   }
 
   if (val1 == 0 && val2 == 10) {
