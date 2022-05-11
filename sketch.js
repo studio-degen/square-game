@@ -288,6 +288,38 @@ function useVals(val1, val2) {
         } else {
           shared.grid[i][j].isRotator = false;
         }
+
+        if (shared.grid[i][j].isRotator) {
+          if (shared.grid[i][j].col.length > 1) {
+            let myCol = shared.grid[i][j].col[shared.grid[i][j].col.length - 1];
+            if(partyIsHost()){
+              colors.player1.forEach((c) => {
+                if (c == myCol) {
+                  tip = "you can rotate this";
+                }
+              });
+              colors.player2.forEach((c) => {
+                if (c == myCol) {
+                  tip = "you cant rotate this";
+                }
+              });
+              
+            }else{
+              colors.player1.forEach((c) => {
+                if (c == myCol) {
+                  tip = "you cant rotate this";
+                }
+              });
+              colors.player2.forEach((c) => {
+                if (c == myCol) {
+                  tip = "you can rotate this";
+                }
+              });
+            }
+          }else{
+            tip = "";
+          }
+        }
       }
     } 
   }
